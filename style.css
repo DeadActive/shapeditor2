@@ -1,0 +1,260 @@
+/* Modern CSS Reset */
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    border: 0;
+}
+
+/* Remove list styles */
+ul,
+ol {
+    list-style: none;
+}
+
+/* Remove default button styles */
+button {
+    background: none;
+    border: none;
+    padding: 0;
+    font: inherit;
+    cursor: pointer;
+    outline: inherit;
+}
+
+/* Remove text decoration from links */
+a {
+    text-decoration: none;
+    color: inherit;
+}
+
+/* Remove default table spacing */
+table {
+    border-collapse: collapse;
+    border-spacing: 0;
+}
+
+/* Remove default form element styles */
+input,
+textarea,
+select {
+    font: inherit;
+    margin: 0;
+}
+
+/* Main styles */
+:root {
+    --bg-color: #1e1e1e;
+    --text-color: #ffffff;
+    --primary-color: #646cff;
+    --hover-color: #535bf2;
+    --border-color: #333333;
+}
+
+html {
+    line-height: 1.15;
+    -webkit-text-size-adjust: 100%;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+    margin: 0;
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    overflow: hidden;
+    height: 100vh;
+    width: 100vw;
+    position: fixed;
+}
+
+/* Canvas container styles */
+#canvas-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: #2a2a2a;
+    background-image: linear-gradient(45deg, #222 25%, transparent 25%),
+        linear-gradient(-45deg, #222 25%, transparent 25%), linear-gradient(45deg, transparent 75%, #222 75%),
+        linear-gradient(-45deg, transparent 75%, #222 75%);
+    background-size: 20px 20px;
+    background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
+    user-select: none;
+    -webkit-user-select: none;
+    touch-action: none;
+}
+
+/* SVG element styles */
+svg {
+    width: 100%;
+    height: 100%;
+    cursor: default;
+    display: block; /* Remove extra space */
+}
+
+/* Path styles */
+path {
+    vector-effect: non-scaling-stroke;
+    transition: stroke-width 0.2s ease;
+    pointer-events: all;
+}
+
+path:hover {
+    stroke-width: 3px;
+}
+
+/* Selection styles */
+.selected {
+    stroke-width: 3px;
+    stroke-dasharray: 5 5;
+    animation: dash 1s linear infinite;
+}
+
+@keyframes dash {
+    to {
+        stroke-dashoffset: -10;
+    }
+}
+
+/* Control point styles */
+.control-point {
+    fill: white;
+    stroke: var(--primary-color);
+    stroke-width: 2;
+    cursor: move;
+    pointer-events: all;
+}
+
+.control-point:hover {
+    fill: var(--primary-color);
+}
+
+/* Handle styles */
+.handle {
+    stroke: rgba(100, 108, 255, 0.5);
+    stroke-width: 1;
+    stroke-dasharray: 4 4;
+    pointer-events: none;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+    .control-point {
+        r: 6; /* Larger touch targets on mobile */
+    }
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+    :root {
+        --bg-color: #1e1e1e;
+        --text-color: #ffffff;
+    }
+}
+
+@media (prefers-color-scheme: light) {
+    :root {
+        --bg-color: #ffffff;
+        --text-color: #213547;
+    }
+
+    #canvas-container {
+        background-color: #f5f5f5;
+        background-image: linear-gradient(45deg, #eee 25%, transparent 25%),
+            linear-gradient(-45deg, #eee 25%, transparent 25%), linear-gradient(45deg, transparent 75%, #eee 75%),
+            linear-gradient(-45deg, transparent 75%, #eee 75%);
+    }
+}
+
+/* History Panel Styles */
+.history-panel {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    width: 300px;
+    background: rgba(30, 30, 30, 0.9);
+    border-radius: 8px;
+    padding: 16px;
+    color: #fff;
+    font-family: 'Inter', system-ui, sans-serif;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    z-index: 1000;
+}
+
+.history-controls {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 16px;
+}
+
+.history-controls button {
+    flex: 1;
+    padding: 8px 16px;
+    background: var(--primary-color);
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.history-controls button:hover {
+    background: var(--hover-color);
+}
+
+.history-container {
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.history-container h3 {
+    margin: 12px 0 8px;
+    font-size: 14px;
+    color: #888;
+}
+
+.history-list,
+.redo-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.history-list li,
+.redo-list li {
+    padding: 6px 8px;
+    margin: 2px 0;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 4px;
+    font-size: 13px;
+    transition: background-color 0.2s;
+}
+
+.history-list li:hover,
+.redo-list li:hover {
+    background: rgba(255, 255, 255, 0.15);
+}
+
+/* Scrollbar styles */
+.history-container::-webkit-scrollbar {
+    width: 8px;
+}
+
+.history-container::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 4px;
+}
+
+.history-container::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 4px;
+}
+
+.history-container::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.4);
+}
