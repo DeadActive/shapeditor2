@@ -2,7 +2,7 @@ import { Tree } from './core/Tree.js';
 import { Canvas } from './core/Canvas.js';
 import { UIManager } from './ui/UIManager.js';
 import { EventManager } from './events/EventManager.js';
-import { createZIndexExample } from './examples/ZIndexExample.js';
+import { ExampleManager } from './examples/ExampleManager.js';
 
 /**
  * @class App
@@ -16,8 +16,10 @@ export class App {
         this.container = container;
         this.canvas = new Canvas('main', 'Main Canvas', 800, 600);
         this.tree = new Tree(this.canvas);
-        this.uiManager = new UIManager(this);
         this.eventManager = new EventManager(this);
+        this.exampleManager = new ExampleManager(this);
+
+        this.uiManager = new UIManager(this);
     }
 
     /**
@@ -31,20 +33,11 @@ export class App {
         // Инициализируем обработчики событий
         this.eventManager.init();
 
-        // Загружаем пример
-        this.loadExample();
+        // Загружаем пример по умолчанию
+        this.exampleManager.loadExample('zindex');
 
         // Устанавливаем обработчик очистки
         window.addEventListener('unload', () => this.dispose());
-    }
-
-    /**
-     * @method loadExample
-     * @description Загружает пример для демонстрации.
-     */
-    loadExample() {
-        const example = createZIndexExample(this.tree);
-        this.uiManager.renderer.update();
     }
 
     /**

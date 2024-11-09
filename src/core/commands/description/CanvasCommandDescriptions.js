@@ -53,3 +53,10 @@ export class ZoomCanvasDescription extends CommandDescription {
         return `Zoom (scale: ${command.scale.toFixed(2)})`;
     }
 }
+
+export class AccumulatedZoomDescription extends CommandDescription {
+    getDescription() {
+        const command = this.command;
+        return `Accumulated Zoom (scale: ${command.totalScale.toFixed(2)})`;
+    }
+}

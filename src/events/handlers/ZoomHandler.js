@@ -53,6 +53,8 @@ export class ZoomHandler {
         this.wheelTimeout = setTimeout(() => {
             this.finishZoom();
         }, 200);
+
+        this.manager.app.uiManager.renderer.update();
     }
 
     finishZoom() {
@@ -87,6 +89,7 @@ export class ZoomHandler {
         }
 
         this.lastPinchDistance = currentDistance;
+        this.manager.app.uiManager.renderer.update();
     }
 
     handleTouchEnd() {

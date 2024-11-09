@@ -51,6 +51,7 @@ select {
     --primary-color: #646cff;
     --hover-color: #535bf2;
     --border-color: #333333;
+    --shape-rendering: optimizeSpeed;
 }
 
 html {
@@ -95,6 +96,10 @@ svg {
     height: 100%;
     cursor: default;
     display: block; /* Remove extra space */
+}
+
+svg * {
+    shape-rendering: var(--shape-rendering);
 }
 
 /* Path styles */
@@ -171,11 +176,57 @@ path:hover {
     }
 }
 
+/* Common Panel Styles */
+.panel-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 12px;
+    cursor: pointer;
+    user-select: none;
+}
+
+.panel-header h3 {
+    margin: 0;
+    font-size: 14px;
+    color: #888;
+}
+
+.panel-header .collapse-button {
+    width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #888;
+    font-size: 18px;
+    transition: transform 0.2s;
+}
+
+.panel-header .collapse-button.collapsed {
+    transform: rotate(-90deg);
+}
+
+.panel-content {
+    transition: height 0.3s ease-out, opacity 0.2s ease-out;
+    overflow: hidden;
+}
+
+.panel-content.collapsed {
+    height: 0 !important;
+    opacity: 0;
+}
+
+/* Update existing panel styles to use common classes */
+.history-panel,
+.example-panel,
+.render-mode-panel {
+    transition: height 0.3s ease-out;
+}
+
 /* History Panel Styles */
 .history-panel {
     position: fixed;
-    top: 20px;
-    right: 20px;
     width: 300px;
     background: rgba(30, 30, 30, 0.9);
     border-radius: 8px;
@@ -186,43 +237,16 @@ path:hover {
     z-index: 1000;
 }
 
-.history-controls {
-    display: flex;
-    gap: 8px;
-    margin-bottom: 16px;
-}
-
-.history-controls button {
-    flex: 1;
-    padding: 8px 16px;
-    background: var(--primary-color);
-    color: white;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    transition: background-color 0.2s;
-}
-
-.history-controls button:hover {
-    background: var(--hover-color);
-}
-
 .history-container {
-    max-height: 400px;
+    max-height: 320px;
     overflow-y: auto;
-}
-
-.history-container h3 {
-    margin: 12px 0 8px;
-    font-size: 14px;
-    color: #888;
 }
 
 .history-list,
 .redo-list {
     list-style: none;
     padding: 0;
-    margin: 0;
+    margin: 0 0 8px 0;
 }
 
 .history-list li,
@@ -238,6 +262,40 @@ path:hover {
 .history-list li:hover,
 .redo-list li:hover {
     background: rgba(255, 255, 255, 0.15);
+}
+
+.history-controls {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.history-button {
+    width: 32px;
+    height: 32px;
+    padding: 0;
+    background: var(--primary-color);
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    font-size: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.history-button:hover {
+    background: var(--hover-color);
+}
+
+.history-button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
 }
 
 /* Scrollbar styles */
@@ -256,5 +314,162 @@ path:hover {
 }
 
 .history-container::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.4);
+}
+
+.example-panel {
+    position: relative;
+    width: 300px;
+    background: rgba(30, 30, 30, 0.9);
+    border-radius: 8px;
+    padding: 16px;
+    color: #fff;
+    font-family: 'Inter', system-ui, sans-serif;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    z-index: 1000;
+}
+
+.example-panel h3 {
+    margin: 0 0 12px 0;
+    font-size: 14px;
+    color: #888;
+}
+
+.example-select {
+    width: 100%;
+    padding: 8px;
+    margin-bottom: 12px;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 4px;
+    color: #fff;
+    font-size: 13px;
+    cursor: pointer;
+}
+
+.example-select:hover {
+    background: rgba(255, 255, 255, 0.15);
+}
+
+.example-select option {
+    background: #1e1e1e;
+    color: #fff;
+}
+
+.example-description {
+    padding: 8px;
+    margin: 0;
+    font-size: 13px;
+    color: #fff;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 4px;
+    line-height: 1.4;
+}
+
+/* Render Mode Panel Styles */
+.render-mode-panel {
+    position: fixed;
+    width: 300px;
+    background: rgba(30, 30, 30, 0.9);
+    border-radius: 8px;
+    padding: 16px;
+    color: #fff;
+    font-family: 'Inter', system-ui, sans-serif;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    z-index: 1000;
+}
+
+.render-mode-panel h3 {
+    margin: 0 0 12px 0;
+    font-size: 14px;
+    color: #888;
+}
+
+.render-mode-container {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.render-mode-option {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    padding: 8px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.render-mode-option:hover {
+    background: rgba(255, 255, 255, 0.15);
+}
+
+.render-mode-option input[type='radio'] {
+    margin-top: 2px;
+}
+
+.render-mode-text {
+    display: flex;
+    flex-direction: column;
+}
+
+.render-mode-name {
+    font-size: 13px;
+    font-weight: 500;
+}
+
+.render-mode-description {
+    font-size: 11px;
+    color: #888;
+}
+
+/* Panel Stack Styles */
+.panel-stack {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    width: 300px;
+    z-index: 1000;
+    display: flex;
+    flex-direction: column;
+    gap: 10px; /* Отступ между панелями */
+    max-height: calc(100vh - 40px); /* Высота экрана минус отступы сверху и снизу */
+    overflow-y: auto; /* Добавляем скролл если панели не помещаются */
+}
+
+/* Update panel styles to work with flex */
+.history-panel,
+.example-panel,
+.render-mode-panel {
+    position: relative;
+    width: 100%;
+    transition: all 0.3s ease-out;
+    flex-shrink: 0; /* Предотвращаем сжатие панелей */
+}
+
+/* Panel content transition */
+.panel-content {
+    transition: height 0.3s ease-out, opacity 0.2s ease-out;
+    overflow: hidden;
+}
+
+/* Scrollbar styles for panel stack */
+.panel-stack::-webkit-scrollbar {
+    width: 8px;
+}
+
+.panel-stack::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 4px;
+}
+
+.panel-stack::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 4px;
+}
+
+.panel-stack::-webkit-scrollbar-thumb:hover {
     background: rgba(255, 255, 255, 0.4);
 }

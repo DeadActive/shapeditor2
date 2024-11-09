@@ -1,6 +1,8 @@
 import { Renderer } from '../core/Renderer.js';
 import { HistoryPanel } from './HistoryPanel.js';
-import { App } from '../App.js';
+import { ExamplePanel } from './ExamplePanel.js';
+import { RenderModePanel } from './RenderModePanel.js';
+import { PanelStack } from './PanelStack.js';
 
 /**
  * @class UIManager
@@ -13,7 +15,12 @@ export class UIManager {
     constructor(app) {
         this.app = app;
         this.renderer = new Renderer(app.tree, app.container);
+        this.panelStack = new PanelStack();
+
+        // Создаем панели
         this.historyPanel = new HistoryPanel(app.tree, this.renderer);
+        this.examplePanel = new ExamplePanel(app.exampleManager);
+        this.renderModePanel = new RenderModePanel(this.renderer);
     }
 
     /**
@@ -22,7 +29,16 @@ export class UIManager {
      */
     init() {
         this.renderer.init();
+
+        // Инициализируем панели
         this.historyPanel.init();
+        this.examplePanel.init();
+        this.renderModePanel.init();
+
+        // Добавляем панели в стек
+        this.panelStack.addPanel(this.historyPanel);
+        this.panelStack.addPanel(this.examplePanel);
+        this.panelStack.addPanel(this.renderModePanel);
     }
 
     /**
@@ -31,5 +47,6 @@ export class UIManager {
      */
     dispose() {
         this.renderer.dispose();
+        this.panelStack.dispose();
     }
 }

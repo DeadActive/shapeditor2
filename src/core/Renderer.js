@@ -53,10 +53,9 @@ export class Renderer {
 
     /**
      * @method render
-     * @description Рендерит или обновляет все узлы дерева.
+     * @description Рендерит или обновляет только измененные пути.
      */
     render() {
-        console.log('render');
         if (!this.svgElement) {
             this.init();
         }
@@ -66,25 +65,53 @@ export class Renderer {
             this.updateCanvasAttributes();
         }
 
-        // Очищаем предыдущие пути
-        this.pathElements.forEach(element => element.remove());
-        this.pathElements.clear();
-
-        // Рендерим все пути
+        // Получаем текущие пути
+        const currentPaths = new Set();
         this.tree.root.children.forEach(path => {
             if (path.type === 'path') {
-                this.renderPath(path);
+                currentPaths.add(path.id);
+                if (path.dirty) {
+                    this.renderPath(path);
+                }
+            }
+        });
+
+        // Удаляем пути, которых больше нет в дереве
+        this.pathElements.forEach((element, id) => {
+            if (!currentPaths.has(id)) {
+                element.remove();
+                this.pathElements.delete(id);
+            }
+        });
+
+        // Обновляем z-index путей
+        this.updatePathsOrder();
+    }
+
+    /**
+     * @method updatePathsOrder
+     * @description Обновляет порядок отрисовки путей в SVG.
+     * @private
+     */
+    updatePathsOrder() {
+        this.tree.root.children.forEach(path => {
+            if (path.type === 'path') {
+                const element = this.pathElements.get(path.id);
+                if (element) {
+                    this.svgElement.appendChild(element); // Перемещаем в конец, что соответствует верхнему z-index
+                }
             }
         });
     }
 
     /**
      * @method renderPath
-     * @description Рендерит отдельный путь.
+     * @description Рендерит или обновляет отдельный путь.
      * @param {Path} path - Путь для рендеринга.
      */
     renderPath(path) {
         let pathElement = this.pathElements.get(path.id);
+        console.log('renderPath', path.id);
 
         if (!pathElement) {
             pathElement = document.createElementNS('http://www.w3.org/2000/svg', 'path');
@@ -103,6 +130,8 @@ export class Renderer {
         const position = path.getAbsolutePosition();
         if (position.x !== 0 || position.y !== 0) {
             pathElement.setAttribute('transform', `translate(${position.x} ${position.y})`);
+        } else {
+            pathElement.removeAttribute('transform');
         }
     }
 
@@ -111,7 +140,6 @@ export class Renderer {
      * @description Планирует обновление рендера на следующем frame.
      */
     update() {
-        console.log('update');
         if (!this.isRenderScheduled) {
             this.isRenderScheduled = true;
             this.animationFrameId = requestAnimationFrame(() => this.renderIfNeeded());
@@ -141,10 +169,15 @@ export class Renderer {
      * @private
      */
     hasChanges(node) {
-        if (node.dirty) {
-            return true;
-        }
-        return node.children.some(child => this.hasChanges(child));
+        let hasChanges = false;
+        this.tree.traverse(
+            node => {
+                hasChanges = true;
+            },
+            node,
+            { skipDirtyCheck: false }
+        );
+        return hasChanges;
     }
 
     /**

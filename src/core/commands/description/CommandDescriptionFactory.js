@@ -16,6 +16,7 @@ export class CommandDescriptionFactory {
         ['SetViewBoxCommand', CanvasDescriptions.SetViewBoxDescription],
         ['PanCanvasCommand', CanvasDescriptions.PanCanvasDescription],
         ['ZoomCanvasCommand', CanvasDescriptions.ZoomCanvasDescription],
+        ['AccumulatedZoomCommand', CanvasDescriptions.AccumulatedZoomDescription],
 
         // Z-Index Commands
         ['MoveNodeUpCommand', ZIndexDescriptions.MoveNodeUpDescription],

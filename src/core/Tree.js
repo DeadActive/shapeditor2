@@ -24,17 +24,55 @@ export class Tree {
     }
 
     /**
+     * @method traverse
+     * @description Рекурсивно обходит дерево и выполняет callback для каждого узла.
+     * @param {Function} callback - Функция, вызываемая для каждого узла.
+     * @param {Node} [node=this.root] - Начальный узел обхода.
+     * @param {Object} [options={
+     *   skipDirtyCheck: false,
+     *   direction: 'down',
+     *   nodeTypes: null
+     * }] - Опции обхода.
+     */
+    traverse(callback, node = this.root, options = {}) {
+        const defaultOptions = {
+            skipDirtyCheck: false, // Пропускать ли проверку на dirty
+            direction: 'down', // 'up' для обхода снизу вверх, 'down' для сверху вниз
+            nodeTypes: null, // Массив типов узлов для фильтрации или null для всех
+        };
+
+        const opts = { ...defaultOptions, ...options };
+
+        // Проверяем тип узла если указан фильтр
+        const isValidType = !opts.nodeTypes || opts.nodeTypes.includes(node.type);
+
+        // Функция обработки узла
+        const processNode = () => {
+            if (isValidType && (opts.skipDirtyCheck || node.dirty)) {
+                callback(node);
+            }
+        };
+
+        // Выбираем порядок обхода
+        if (opts.direction === 'down') {
+            processNode();
+            node.children.forEach(child => {
+                this.traverse(callback, child, opts);
+            });
+        } else {
+            node.children.forEach(child => {
+                this.traverse(callback, child, opts);
+            });
+            processNode();
+        }
+    }
+
+    /**
      * @method update
      * @description Обновляет только изменённые узлы.
      */
     update() {
-        function recurse(node) {
-            if (node.dirty) {
-                node.clearDirty();
-            }
-            node.children.forEach(recurse);
-        }
-        recurse(this.root);
+        this.traverse(node => node.clearDirty(), this.root, { skipDirtyCheck: false });
     }
 
     /**
@@ -46,7 +84,6 @@ export class Tree {
         command.execute();
         this.history.push(command);
         this.redoStack = []; // Очистить стек для повторного выполнения
-        this.root.markDirty();
         if (this.renderer) {
             this.renderer.update();
         }
@@ -61,7 +98,6 @@ export class Tree {
         if (command) {
             command.undo();
             this.redoStack.push(command);
-            this.root.markDirty();
             if (this.renderer) {
                 this.renderer.update();
             }

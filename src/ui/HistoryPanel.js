@@ -1,19 +1,20 @@
+import { Panel } from './Panel.js';
 import { CommandDescriptionFactory } from '../core/commands/description/CommandDescriptionFactory.js';
-import { Tree } from '../core/Tree.js';
-import { Command } from '../core/commands/Command.js';
 
 /**
  * @class HistoryPanel
+ * @extends Panel
  * @description UI панель для отображения и управления историей команд.
  */
-export class HistoryPanel {
+export class HistoryPanel extends Panel {
     /**
      * @param {Tree} tree - Дерево с историей команд.
+     * @param {Renderer} renderer - Рендерер.
      */
     constructor(tree, renderer) {
+        super('History', 'history-panel');
         this.tree = tree;
         this.renderer = renderer;
-        this.panel = null;
         this.historyList = null;
         this.redoList = null;
     }
@@ -23,23 +24,40 @@ export class HistoryPanel {
      * @description Инициализирует панель истории.
      */
     init() {
-        // Создаем основной контейнер
-        this.panel = document.createElement('div');
-        this.panel.className = 'history-panel';
+        // Создаем базовую структуру панели
+        const panel = this.createPanel();
+
+        // Создаем списки истории
+        const historyContainer = document.createElement('div');
+        historyContainer.className = 'history-container';
+
+        // Создаем список истории
+        this.historyList = document.createElement('ul');
+        this.historyList.className = 'history-list';
+        historyContainer.appendChild(this.historyList);
+
+        // Создаем список redo
+        this.redoList = document.createElement('ul');
+        this.redoList.className = 'redo-list';
+        historyContainer.appendChild(this.redoList);
 
         // Создаем кнопки управления
         const controls = document.createElement('div');
         controls.className = 'history-controls';
 
         const undoButton = document.createElement('button');
-        undoButton.textContent = 'Undo';
+        undoButton.className = 'history-button undo-button';
+        undoButton.innerHTML = '↶';
+        undoButton.title = 'Undo';
         undoButton.onclick = () => {
             this.tree.undo();
             this.update();
         };
 
         const redoButton = document.createElement('button');
-        redoButton.textContent = 'Redo';
+        redoButton.className = 'history-button redo-button';
+        redoButton.innerHTML = '↷';
+        redoButton.title = 'Redo';
         redoButton.onclick = () => {
             this.tree.redo();
             this.update();
@@ -48,31 +66,12 @@ export class HistoryPanel {
         controls.appendChild(undoButton);
         controls.appendChild(redoButton);
 
-        // Создаем списки истории
-        const historyContainer = document.createElement('div');
-        historyContainer.className = 'history-container';
+        // Добавляем контейнеры в панель
+        this.content.appendChild(historyContainer);
+        this.content.appendChild(controls);
 
-        const historyTitle = document.createElement('h3');
-        historyTitle.textContent = 'History';
-        this.historyList = document.createElement('ul');
-        this.historyList.className = 'history-list';
-
-        const redoTitle = document.createElement('h3');
-        redoTitle.textContent = 'Redo Stack';
-        this.redoList = document.createElement('ul');
-        this.redoList.className = 'redo-list';
-
-        historyContainer.appendChild(historyTitle);
-        historyContainer.appendChild(this.historyList);
-        historyContainer.appendChild(redoTitle);
-        historyContainer.appendChild(this.redoList);
-
-        // Собираем панель
-        this.panel.appendChild(controls);
-        this.panel.appendChild(historyContainer);
-
-        // Добавляем на страницу
-        document.body.appendChild(this.panel);
+        // Добавляем панель на страницу
+        document.body.appendChild(panel);
 
         // Подписываемся на обновления дерева
         const originalExecuteCommand = this.tree.executeCommand;
@@ -81,20 +80,11 @@ export class HistoryPanel {
             this.update();
         };
 
-        const originalUndo = this.tree.undo;
-        this.tree.undo = () => {
-            originalUndo.call(this.tree);
-            this.update();
-        };
-
-        const originalRedo = this.tree.redo;
-        this.tree.redo = () => {
-            originalRedo.call(this.tree);
-            this.update();
-        };
-
         // Первичное обновление
         this.update();
+
+        // Восстанавливаем состояние сворачивания
+        this.restoreState();
     }
 
     /**
@@ -107,14 +97,14 @@ export class HistoryPanel {
         this.redoList.innerHTML = '';
 
         // Обновляем список истории
-        this.tree.history.forEach((command, index) => {
+        this.tree.history.forEach(command => {
             const item = document.createElement('li');
             item.textContent = this._getCommandDescription(command);
             this.historyList.appendChild(item);
         });
 
         // Обновляем список redo
-        this.tree.redoStack.forEach((command, index) => {
+        this.tree.redoStack.forEach(command => {
             const item = document.createElement('li');
             item.textContent = this._getCommandDescription(command);
             this.redoList.appendChild(item);
