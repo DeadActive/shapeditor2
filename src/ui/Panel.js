@@ -60,14 +60,16 @@ export class Panel {
 
         const button = this.panel.querySelector('.collapse-button');
         const content = this.panel.querySelector('.panel-content');
+        const header = this.panel.querySelector('.panel-header');
 
         if (this.isCollapsed) {
             button.classList.add('collapsed');
             content.classList.add('collapsed');
+            header.classList.add('collapsed');
         } else {
             button.classList.remove('collapsed');
             content.classList.remove('collapsed');
-            content.style.height = content.scrollHeight + 'px';
+            header.classList.remove('collapsed');
         }
 
         // Сохраняем состояние в localStorage

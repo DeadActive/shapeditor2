@@ -1,4 +1,5 @@
 import { Curve } from './Curve.js';
+import { Point } from './Point.js';
 
 /**
  * @class CubicCurve
@@ -9,17 +10,29 @@ export class CubicCurve extends Curve {
     /**
      * @param {string} id - Уникальный идентификатор узла.
      * @param {string} name - Имя кривой.
-     * @param {Point} startPoint - Начальная точка.
-     * @param {Point} control1Point - Первая контрольная точка.
-     * @param {Point} control2Point - Вторая контрольная точка.
-     * @param {Point} endPoint - Конечная точка.
+     * @param {Point} start - Начальная точка.
+     * @param {Point} control1 - Первая контрольная точка.
+     * @param {Point} control2 - Вторая контрольная точка.
+     * @param {Point} end - Конечная точка.
      */
-    constructor(id, name, startPoint, control1Point, control2Point, endPoint) {
+    constructor(id, name, start, control1, control2, end) {
         super(id, name, 'cubic');
-        this.addChild(startPoint);
-        this.addChild(control1Point);
-        this.addChild(control2Point);
-        this.addChild(endPoint);
+        this.addChild(start);
+        this.addChild(control1);
+        this.addChild(control2);
+        this.addChild(end);
+    }
+
+    /**
+     * @method clone
+     * @override
+     * @description Создает глубокую копию кривой.
+     * @param {string} [newId] - Новый идентификатор для клона.
+     * @returns {CubicCurve} Клонированная кривая.
+     */
+    clone(newId = null) {
+        const [start, control1, control2, end] = this.children.map(point => point.clone());
+        return new CubicCurve(newId || `${this.id}_clone`, `${this.name} (clone)`, start, control1, control2, end);
     }
 
     /**

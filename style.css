@@ -184,6 +184,11 @@ path:hover {
     margin-bottom: 12px;
     cursor: pointer;
     user-select: none;
+    transition: margin-bottom 0.2s;
+}
+
+.panel-header.collapsed {
+    margin-bottom: 0;
 }
 
 .panel-header h3 {
@@ -226,7 +231,7 @@ path:hover {
 
 /* History Panel Styles */
 .history-panel {
-    position: fixed;
+    position: relative;
     width: 300px;
     background: rgba(30, 30, 30, 0.9);
     border-radius: 8px;
@@ -235,6 +240,7 @@ path:hover {
     font-family: 'Inter', system-ui, sans-serif;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     z-index: 1000;
+    max-height: 500px;
 }
 
 .history-container {
@@ -436,7 +442,8 @@ path:hover {
     flex-direction: column;
     gap: 10px; /* Отступ между панелями */
     max-height: calc(100vh - 40px); /* Высота экрана минус отступы сверху и снизу */
-    overflow-y: auto; /* Добавляем скролл если панели не помещаются */
+    overflow-y: auto; /* Добавляем скролл если панели не омещаются */
+    overflow-x: hidden;
 }
 
 /* Update panel styles to work with flex */
@@ -472,4 +479,273 @@ path:hover {
 
 .panel-stack::-webkit-scrollbar-thumb:hover {
     background: rgba(255, 255, 255, 0.4);
+}
+
+/* Selection styles */
+.selection-border {
+    pointer-events: none;
+    animation: dash 1s linear infinite;
+}
+
+@keyframes dash {
+    to {
+        stroke-dashoffset: 10;
+    }
+}
+
+/* Tool Overlay Styles */
+.tool-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 1000;
+}
+
+.selection-border {
+    position: absolute;
+    border: 2px solid var(--primary-color);
+    border-radius: 4px;
+    pointer-events: none;
+    box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.3);
+    animation: selection-pulse 2s infinite;
+}
+
+@keyframes selection-pulse {
+    0% {
+        box-shadow: 0 0 0 1px rgba(100, 108, 255, 0.4);
+    }
+    50% {
+        box-shadow: 0 0 0 3px rgba(100, 108, 255, 0.2);
+    }
+    100% {
+        box-shadow: 0 0 0 1px rgba(100, 108, 255, 0.4);
+    }
+}
+
+/* Viewport Panel Styles */
+.viewport-panel {
+    position: relative;
+    width: 300px;
+    background: rgba(30, 30, 30, 0.9);
+    border-radius: 8px;
+    padding: 16px;
+    color: #fff;
+    font-family: 'Inter', system-ui, sans-serif;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    z-index: 1000;
+}
+
+.viewport-info {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    font-size: 13px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 4px;
+    padding: 12px;
+}
+
+.viewport-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.viewport-label {
+    color: #888;
+    font-weight: 500;
+}
+
+.viewport-value {
+    font-family: 'Fira Code', monospace;
+    color: #fff;
+}
+
+/* Performance Panel Styles */
+.performance-panel {
+    position: relative;
+    width: 300px;
+    background: rgba(30, 30, 30, 0.9);
+    border-radius: 8px;
+    padding: 16px;
+    color: #fff;
+    font-family: 'Inter', system-ui, sans-serif;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    z-index: 1000;
+}
+
+.performance-info {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    font-size: 13px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 4px;
+    padding: 12px;
+    opacity: 1;
+    visibility: visible;
+    transition: opacity 0.2s ease-out, visibility 0.2s ease-out;
+}
+
+.performance-info.hidden {
+    display: none;
+    visibility: hidden;
+}
+
+.performance-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.performance-label {
+    color: #888;
+    font-weight: 500;
+}
+
+.performance-value {
+    font-family: 'Fira Code', monospace;
+    color: #fff;
+}
+
+.performance-good {
+    color: #4ade80;
+}
+
+.performance-warning {
+    color: #fbbf24;
+}
+
+.performance-bad {
+    color: #f87171;
+}
+
+/* Performance Panel Toggle Button */
+.performance-container {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.performance-toggle {
+    width: 100%;
+    padding: 8px;
+    background: rgba(255, 255, 255, 0.1);
+    border: none;
+    border-radius: 4px;
+    color: #fff;
+    font-size: 13px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.performance-toggle:hover {
+    background: rgba(255, 255, 255, 0.15);
+}
+
+.performance-toggle.active {
+    background: var(--primary-color);
+}
+
+.performance-toggle.active:hover {
+    background: var(--hover-color);
+}
+
+/* Tree Panel Styles */
+.tree-panel {
+    position: relative;
+    width: 300px;
+    background: rgba(30, 30, 30, 0.9);
+    border-radius: 8px;
+    padding: 16px;
+    color: #fff;
+    font-family: 'Inter', system-ui, sans-serif;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    z-index: 1000;
+}
+
+.tree-container {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 4px;
+    padding: 8px;
+    font-size: 12px;
+    max-height: 400px;
+    overflow-y: auto;
+    overflow-x: auto;
+    white-space: nowrap;
+}
+
+.tree-node {
+    margin: 1px 0;
+}
+
+.tree-node-header {
+    display: flex;
+    align-items: center;
+    padding: 2px 4px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    min-width: fit-content;
+}
+
+.tree-node-header:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.tree-node-toggle {
+    width: 16px;
+    height: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: transform 0.2s;
+    user-select: none;
+    font-size: 10px;
+}
+
+.tree-node-info {
+    flex: 1;
+    margin-left: 4px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.tree-node-info.selected {
+    color: var(--primary-color);
+    font-weight: 500;
+}
+
+.tree-node-children {
+    margin-left: 12px;
+    border-left: 1px solid rgba(255, 255, 255, 0.1);
+    padding-left: 4px;
+}
+
+/* Scrollbar styles for tree container */
+.tree-container::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+
+.tree-container::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 3px;
+}
+
+.tree-container::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 3px;
+}
+
+.tree-container::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.3);
+}
+
+.tree-container::-webkit-scrollbar-corner {
+    background: transparent;
 }

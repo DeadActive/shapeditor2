@@ -1,3 +1,5 @@
+import { CommandRecorder } from './commands/CommandRecorder.js';
+
 /**
  * @class Tree
  * @description Представляет дерево узлов с обновлением только изменённых узлов.
@@ -12,6 +14,8 @@ export class Tree {
         this.history = [];
         this.redoStack = [];
         this.renderer = renderer;
+        this.commandRecorder = new CommandRecorder();
+        this.historyUpdateCallback = null;
     }
 
     /**
@@ -21,6 +25,26 @@ export class Tree {
      */
     setRenderer(renderer) {
         this.renderer = renderer;
+    }
+
+    /**
+     * @method setHistoryUpdateCallback
+     * @description Устанавливает callback для обновления истории.
+     * @param {Function} callback - Функция обновления истории.
+     */
+    setHistoryUpdateCallback(callback) {
+        this.historyUpdateCallback = callback;
+    }
+
+    /**
+     * @method notifyHistoryUpdate
+     * @private
+     * @description Уведомляет об обновлении истории.
+     */
+    notifyHistoryUpdate() {
+        if (this.historyUpdateCallback) {
+            this.historyUpdateCallback();
+        }
     }
 
     /**
@@ -81,12 +105,26 @@ export class Tree {
      * @param {Command} command - Команда для выполнения.
      */
     executeCommand(command) {
+        // Записываем команду если идет запись
+        if (this.commandRecorder.isRecording) {
+            this.commandRecorder.recordCommand(command);
+            command.execute();
+            this.root.markDirty();
+            if (this.renderer) {
+                this.renderer.update();
+            }
+            return;
+        }
+
+        // Обычное выполнение команды
         command.execute();
         this.history.push(command);
-        this.redoStack = []; // Очистить стек для повторного выполнения
+        this.redoStack = [];
+        this.root.markDirty();
         if (this.renderer) {
             this.renderer.update();
         }
+        this.notifyHistoryUpdate();
     }
 
     /**
@@ -98,9 +136,11 @@ export class Tree {
         if (command) {
             command.undo();
             this.redoStack.push(command);
+            this.root.markDirty();
             if (this.renderer) {
                 this.renderer.update();
             }
+            this.notifyHistoryUpdate();
         }
     }
 
@@ -117,6 +157,36 @@ export class Tree {
             if (this.renderer) {
                 this.renderer.update();
             }
+            this.notifyHistoryUpdate();
         }
+    }
+
+    /**
+     * @method startRecording
+     * @description Начинает запись команд.
+     * @param {string} name - Имя для композитной команды.
+     */
+    startRecording(name) {
+        this.commandRecorder = new CommandRecorder(name);
+        this.commandRecorder.startRecording();
+    }
+
+    /**
+     * @method stopRecording
+     * @description Останавливает запись и выполняет композитную команду.
+     */
+    stopRecording() {
+        const compositeCommand = this.commandRecorder.stopRecording();
+        if (!compositeCommand.isEmpty()) {
+            // Добавляем композитную команду в историю без повторного выполнения
+            this.history.push(compositeCommand);
+            this.redoStack = [];
+            // Обновляем рендерер если нужно
+            if (this.renderer) {
+                this.renderer.update();
+            }
+            this.notifyHistoryUpdate();
+        }
+        this.commandRecorder = new CommandRecorder();
     }
 }

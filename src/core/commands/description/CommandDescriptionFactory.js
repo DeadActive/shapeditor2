@@ -1,7 +1,10 @@
 import * as CanvasDescriptions from './CanvasCommandDescriptions.js';
 import * as ZIndexDescriptions from './ZIndexCommandDescriptions.js';
 import * as NodeDescriptions from './NodeCommandDescriptions.js';
+import * as CloneDescriptions from './CloneCommandDescriptions.js';
 import { CommandDescription } from './CommandDescription.js';
+import { CompositeCommand } from '../CompositeCommand.js';
+import { CompositeCommandDescription } from './CompositeCommandDescription.js';
 
 /**
  * @class CommandDescriptionFactory
@@ -9,6 +12,9 @@ import { CommandDescription } from './CommandDescription.js';
  */
 export class CommandDescriptionFactory {
     static #descriptionsMap = new Map([
+        // Composite Command
+        ['CompositeCommand', CompositeCommandDescription],
+
         // Canvas Commands
         ['CanvasTransformCommand', CanvasDescriptions.CanvasTransformDescription],
         ['CanvasResizeCommand', CanvasDescriptions.CanvasResizeDescription],
@@ -33,6 +39,10 @@ export class CommandDescriptionFactory {
         ['MoveNodeCommand', NodeDescriptions.MoveNodeDescription],
         ['SetNodePositionCommand', NodeDescriptions.SetNodePositionDescription],
         ['BatchMoveNodesCommand', NodeDescriptions.BatchMoveNodesDescription],
+
+        // Clone Commands
+        ['CloneNodeCommand', CloneDescriptions.CloneNodeDescription],
+        ['BatchCloneNodesCommand', CloneDescriptions.BatchCloneNodesDescription],
     ]);
 
     /**
@@ -42,6 +52,10 @@ export class CommandDescriptionFactory {
      * @returns {CommandDescription} Описание команды.
      */
     static createDescription(command) {
+        if (command instanceof CompositeCommand) {
+            return new CompositeCommandDescription(command);
+        }
+
         const commandName = command.constructor.name;
         const DescriptionClass = this.#descriptionsMap.get(commandName) || CommandDescription;
         return new DescriptionClass(command);

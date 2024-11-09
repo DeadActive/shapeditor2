@@ -1,15 +1,13 @@
 import { CanvasResizeCommand } from '../../core/commands/CanvasCommands.js';
+import { CanvasEvents } from '../../core/events/CanvasEvents.js';
+import { AppContext } from '../../core/AppContext.js';
 
 /**
  * @class ResizeHandler
  * @description Обработчик событий изменения размера холста.
  */
 export class ResizeHandler {
-    /**
-     * @param {EventManager} manager - Менеджер событий.
-     */
-    constructor(manager) {
-        this.manager = manager;
+    constructor() {
         this.resizeTimeout = null;
         this.canvasResize = null;
 
@@ -18,7 +16,7 @@ export class ResizeHandler {
     }
 
     init() {
-        this.canvasResize = new CanvasResizeCommand(this.manager.app.tree.root);
+        this.canvasResize = new CanvasResizeCommand(AppContext.getApp().tree.root);
         window.addEventListener('resize', this.handleResize);
     }
 
@@ -27,12 +25,19 @@ export class ResizeHandler {
             clearTimeout(this.resizeTimeout);
         }
 
-        const { clientWidth, clientHeight } = this.manager.app.container;
+        const app = AppContext.getApp();
+        const { clientWidth, clientHeight } = app.container;
         this.canvasResize.addResize(clientWidth, clientHeight);
 
+        // Emit resize event
+        const event = new CustomEvent(CanvasEvents.RESIZE, {
+            detail: { width: clientWidth, height: clientHeight },
+        });
+        app.container.dispatchEvent(event);
+
         this.resizeTimeout = setTimeout(() => {
-            this.manager.app.tree.executeCommand(this.canvasResize);
-            this.canvasResize = new CanvasResizeCommand(this.manager.app.tree.root);
+            app.tree.executeCommand(this.canvasResize);
+            this.canvasResize = new CanvasResizeCommand(app.tree.root);
         }, 300);
     }
 

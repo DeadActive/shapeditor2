@@ -1,15 +1,13 @@
 import { AccumulatedZoomCommand } from '../../core/commands/CanvasCommands.js';
+import { CanvasEvents } from '../../core/events/CanvasEvents.js';
+import { AppContext } from '../../core/AppContext.js';
 
 /**
  * @class ZoomHandler
  * @description Обработчик событий масштабирования холста.
  */
 export class ZoomHandler {
-    /**
-     * @param {EventManager} manager - Менеджер событий.
-     */
-    constructor(manager) {
-        this.manager = manager;
+    constructor() {
         this.minZoom = 0.1;
         this.maxZoom = 10;
         this.zoomFactor = 1.1;
@@ -24,20 +22,20 @@ export class ZoomHandler {
     }
 
     init() {
-        const { container } = this.manager.app;
+        const { container } = AppContext.getApp();
         container.addEventListener('wheel', this.handleWheel, { passive: false });
         container.addEventListener('touchstart', this.handleTouchStart);
         container.addEventListener('touchmove', this.handleTouchMove);
         container.addEventListener('touchend', this.handleTouchEnd);
 
-        this.accumulatedZoom = new AccumulatedZoomCommand(this.manager.app.tree.root);
+        this.accumulatedZoom = new AccumulatedZoomCommand(AppContext.getApp().tree.root);
     }
 
     handleWheel(e) {
         if (!e.ctrlKey && !e.metaKey) return;
         e.preventDefault();
 
-        const rect = this.manager.app.container.getBoundingClientRect();
+        const rect = AppContext.getApp().container.getBoundingClientRect();
         const centerX = e.clientX - rect.left;
         const centerY = e.clientY - rect.top;
 
@@ -54,13 +52,13 @@ export class ZoomHandler {
             this.finishZoom();
         }, 200);
 
-        this.manager.app.uiManager.renderer.update();
+        AppContext.getApp().uiManager.renderer.update();
     }
 
     finishZoom() {
         if (this.accumulatedZoom) {
-            this.manager.app.tree.executeCommand(this.accumulatedZoom);
-            this.accumulatedZoom = new AccumulatedZoomCommand(this.manager.app.tree.root);
+            AppContext.getApp().tree.executeCommand(this.accumulatedZoom);
+            this.accumulatedZoom = new AccumulatedZoomCommand(AppContext.getApp().tree.root);
         }
     }
 
@@ -89,15 +87,15 @@ export class ZoomHandler {
         }
 
         this.lastPinchDistance = currentDistance;
-        this.manager.app.uiManager.renderer.update();
+        AppContext.getApp().uiManager.renderer.update();
     }
 
     handleTouchEnd() {
         if (this.lastPinchDistance !== null) {
             this.lastPinchDistance = null;
             // Завершаем накопление зума и добавляем команду в историю
-            this.manager.app.tree.executeCommand(this.accumulatedZoom);
-            this.accumulatedZoom = new AccumulatedZoomCommand(this.manager.app.tree.root);
+            AppContext.getApp().tree.executeCommand(this.accumulatedZoom);
+            this.accumulatedZoom = new AccumulatedZoomCommand(AppContext.getApp().tree.root);
         }
     }
 
@@ -115,10 +113,16 @@ export class ZoomHandler {
         }
 
         this.accumulatedZoom.addZoom(scale, centerX, centerY);
+
+        // Emit zoom event
+        const event = new CustomEvent(CanvasEvents.ZOOM, {
+            detail: { scale, centerX, centerY },
+        });
+        AppContext.getApp().container.dispatchEvent(event);
     }
 
     dispose() {
-        const { container } = this.manager.app;
+        const { container } = AppContext.getApp();
         container.removeEventListener('wheel', this.handleWheel);
         container.removeEventListener('touchstart', this.handleTouchStart);
         container.removeEventListener('touchmove', this.handleTouchMove);

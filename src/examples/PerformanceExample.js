@@ -144,6 +144,8 @@ export class PerformanceExample extends Example {
             );
         }
 
+        tree.startRecording('Initial Setup');
+
         // Добавляем кривые к соответствующим путям
         tree.executeCommand(new BatchAddChildCommand(quadPath, quadCurves));
         tree.executeCommand(new BatchAddChildCommand(cubicPath, cubicCurves));
@@ -154,6 +156,8 @@ export class PerformanceExample extends Example {
         tree.executeCommand(
             new BatchAddChildCommand(tree.root, [quadPath, cubicPath, spiralQuadPath, spiralCubicPath])
         );
+
+        tree.stopRecording();
 
         return {
             paths: {

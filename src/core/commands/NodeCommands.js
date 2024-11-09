@@ -1,4 +1,5 @@
 import { Command } from './Command.js';
+import { Node } from '../Node.js';
 
 /**
  * @class UpdatePropertyCommand

@@ -194,4 +194,30 @@ export class Node {
         if (!this.parent) return -1;
         return this.parent.children.indexOf(this);
     }
+
+    /**
+     * @method clone
+     * @description Создает глубокую копию узла.
+     * @param {string} [newId] - Новый идентификатор для клона (опционально).
+     * @returns {Node} Клонированный узел.
+     */
+    clone(newId = null) {
+        // Создаем новый узел того же типа
+        const clone = new this.constructor(newId || `${this.id}_clone`, `${this.name} (clone)`);
+
+        // Копируем все свойства
+        Object.keys(this).forEach(key => {
+            if (key !== 'id' && key !== 'name' && key !== 'children' && key !== 'parent') {
+                clone[key] = this[key];
+            }
+        });
+
+        // Рекурсивно клонируем дочерние узлы
+        this.children.forEach(child => {
+            const childClone = child.clone();
+            clone.addChild(childClone);
+        });
+
+        return clone;
+    }
 }

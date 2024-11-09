@@ -1,4 +1,5 @@
 import { Curve } from './Curve.js';
+import { Point } from './Point.js';
 
 /**
  * @class QuadraticCurve
@@ -9,15 +10,27 @@ export class QuadraticCurve extends Curve {
     /**
      * @param {string} id - Уникальный идентификатор узла.
      * @param {string} name - Имя кривой.
-     * @param {Point} startPoint - Начальная точка.
-     * @param {Point} controlPoint - Контрольная точка.
-     * @param {Point} endPoint - Конечная точка.
+     * @param {Point} start - Начальная точка.
+     * @param {Point} control - Контрольная точка.
+     * @param {Point} end - Конечная точка.
      */
-    constructor(id, name, startPoint, controlPoint, endPoint) {
+    constructor(id, name, start, control, end) {
         super(id, name, 'quadratic');
-        this.addChild(startPoint);
-        this.addChild(controlPoint);
-        this.addChild(endPoint);
+        this.addChild(start);
+        this.addChild(control);
+        this.addChild(end);
+    }
+
+    /**
+     * @method clone
+     * @override
+     * @description Создает глубокую копию кривой.
+     * @param {string} [newId] - Новый идентификатор для клона.
+     * @returns {QuadraticCurve} Клонированная кривая.
+     */
+    clone(newId = null) {
+        const [start, control, end] = this.children.map(point => point.clone());
+        return new QuadraticCurve(newId || `${this.id}_clone`, `${this.name} (clone)`, start, control, end);
     }
 
     /**
@@ -51,7 +64,7 @@ export class QuadraticCurve extends Curve {
      * @protected
      * @description Возвращает базовую строку для атрибута d SVG-пути без закрытия.
      * @param {boolean} [isFirst=true] - Является ли кривая первой в пути.
-     * @returns {string} Строка для атрибута d.
+     * @returns {string} Ст��ока для атрибута d.
      */
     _getBaseSVGPathData(isFirst = true) {
         const { start, control, end } = this.getPoints();

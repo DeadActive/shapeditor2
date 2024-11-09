@@ -8,14 +8,14 @@ import { BatchAddChildCommand } from '../core/commands/NodeCommands.js';
 /**
  * @class ZIndexExample
  * @extends Example
- * @description Пример с тремя перекрывающимися путями для демонстрации z-index.
+ * @description Пример с тремя перекрывающимися прямоугольными путями для демонстрации z-index.
  */
 export class ZIndexExample extends Example {
     constructor() {
         super(
             'zindex',
             'Z-Index Example',
-            'Демонстрация управления порядком отрисовки (z-index) с тремя перекрывающимися путями.'
+            'Демонстрация управления порядком отрисовки (z-index) с тремя перекрывающимися прямоугольниками.'
         );
     }
 
@@ -44,60 +44,64 @@ export class ZIndexExample extends Example {
             fillColor: 'rgba(0, 0, 255, 0.2)',
         });
 
-        // Создаем кривые для нижнего пути (красный)
-        const bottomCurve1 = new QuadraticCurve(
-            'bq1',
-            'Bottom Quad 1',
-            new Point('bq1s', 'Start', 50, 50),
-            new Point('bq1c', 'Control', 100, 0),
-            new Point('bq1e', 'End', 150, 50)
+        // Создаем кривые для нижнего прямоугольника (красный)
+        const bottomCurve1 = new CubicCurve(
+            'bc1',
+            'Bottom Side 1',
+            new Point('bc1s', 'Start', 50, 50),
+            new Point('bc1c1', 'Control 1', 50, 50),
+            new Point('bc1c2', 'Control 2', 250, 50),
+            new Point('bc1e', 'End', 250, 50)
         );
 
         const bottomCurve2 = new CubicCurve(
-            'bc1',
-            'Bottom Cubic',
-            new Point('bc1s', 'Start', 150, 50),
-            new Point('bc1c1', 'Control 1', 200, 0),
-            new Point('bc1c2', 'Control 2', 250, 100),
-            new Point('bc1e', 'End', 300, 50)
+            'bc2',
+            'Bottom Side 2',
+            new Point('bc2s', 'Start', 250, 50),
+            new Point('bc2c1', 'Control 1', 250, 250),
+            new Point('bc2c2', 'Control 2', 250, 250),
+            new Point('bc2e', 'End', 250, 250)
         );
 
-        // Создаем кривые для среднего пути (зеленый)
-        const middleCurve1 = new QuadraticCurve(
-            'mq1',
-            'Middle Quad 1',
-            new Point('mq1s', 'Start', 100, 100),
-            new Point('mq1c', 'Control', 150, 50),
-            new Point('mq1e', 'End', 200, 100)
+        // Создаем кривые для среднего прямоугольника (зеленый)
+        const middleCurve1 = new CubicCurve(
+            'mc1',
+            'Middle Side 1',
+            new Point('mc1s', 'Start', 100, 100),
+            new Point('mc1c1', 'Control 1', 100, 100),
+            new Point('mc1c2', 'Control 2', 300, 100),
+            new Point('mc1e', 'End', 300, 100)
         );
 
         const middleCurve2 = new CubicCurve(
-            'mc1',
-            'Middle Cubic',
-            new Point('mc1s', 'Start', 200, 100),
-            new Point('mc1c1', 'Control 1', 250, 50),
-            new Point('mc1c2', 'Control 2', 300, 150),
-            new Point('mc1e', 'End', 350, 100)
+            'mc2',
+            'Middle Side 2',
+            new Point('mc2s', 'Start', 300, 100),
+            new Point('mc2c1', 'Control 1', 300, 300),
+            new Point('mc2c2', 'Control 2', 300, 300),
+            new Point('mc2e', 'End', 300, 300)
         );
 
-        // Создаем кривые для верхнего пути (синий)
-        const topCurve1 = new QuadraticCurve(
-            'tq1',
-            'Top Quad 1',
-            new Point('tq1s', 'Start', 150, 150),
-            new Point('tq1c', 'Control', 200, 100),
-            new Point('tq1e', 'End', 250, 150)
+        // Создаем кривые для верхнего прямоугольника (синий)
+        const topCurve1 = new CubicCurve(
+            'tc1',
+            'Top Side 1',
+            new Point('tc1s', 'Start', 150, 150),
+            new Point('tc1c1', 'Control 1', 150, 150),
+            new Point('tc1c2', 'Control 2', 350, 150),
+            new Point('tc1e', 'End', 350, 150)
         );
 
         const topCurve2 = new CubicCurve(
-            'tc1',
-            'Top Cubic',
-            new Point('tc1s', 'Start', 250, 150),
-            new Point('tc1c1', 'Control 1', 300, 100),
-            new Point('tc1c2', 'Control 2', 350, 200),
-            new Point('tc1e', 'End', 400, 150)
+            'tc2',
+            'Top Side 2',
+            new Point('tc2s', 'Start', 350, 150),
+            new Point('tc2c1', 'Control 1', 350, 350),
+            new Point('tc2c2', 'Control 2', 350, 350),
+            new Point('tc2e', 'End', 350, 350)
         );
 
+        tree.startRecording('Initial Setup');
         // Добавляем кривые к соответствующим путям
         tree.executeCommand(new BatchAddChildCommand(bottomPath, [bottomCurve1, bottomCurve2]));
         tree.executeCommand(new BatchAddChildCommand(middlePath, [middleCurve1, middleCurve2]));
@@ -106,10 +110,12 @@ export class ZIndexExample extends Example {
         // Добавляем все пути к холсту
         tree.executeCommand(new BatchAddChildCommand(tree.root, [bottomPath, middlePath, topPath]));
 
-        // Замыкаем пути для создания заполненных фигур
+        // Замыкаем пути для создания заполненных прямоугольников
         bottomPath.close();
         middlePath.close();
         topPath.close();
+
+        tree.stopRecording();
 
         return {
             paths: {

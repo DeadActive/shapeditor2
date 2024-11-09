@@ -1,5 +1,6 @@
 import { Panel } from './Panel.js';
 import { CommandDescriptionFactory } from '../core/commands/description/CommandDescriptionFactory.js';
+import { AppContext } from '../core/AppContext.js';
 
 /**
  * @class HistoryPanel
@@ -7,22 +8,12 @@ import { CommandDescriptionFactory } from '../core/commands/description/CommandD
  * @description UI панель для отображения и управления историей команд.
  */
 export class HistoryPanel extends Panel {
-    /**
-     * @param {Tree} tree - Дерево с историей команд.
-     * @param {Renderer} renderer - Рендерер.
-     */
-    constructor(tree, renderer) {
+    constructor() {
         super('History', 'history-panel');
-        this.tree = tree;
-        this.renderer = renderer;
         this.historyList = null;
         this.redoList = null;
     }
 
-    /**
-     * @method init
-     * @description Инициализирует панель истории.
-     */
     init() {
         // Создаем базовую структуру панели
         const panel = this.createPanel();
@@ -50,7 +41,7 @@ export class HistoryPanel extends Panel {
         undoButton.innerHTML = '↶';
         undoButton.title = 'Undo';
         undoButton.onclick = () => {
-            this.tree.undo();
+            AppContext.getApp().tree.undo();
             this.update();
         };
 
@@ -59,7 +50,7 @@ export class HistoryPanel extends Panel {
         redoButton.innerHTML = '↷';
         redoButton.title = 'Redo';
         redoButton.onclick = () => {
-            this.tree.redo();
+            AppContext.getApp().tree.redo();
             this.update();
         };
 
@@ -74,11 +65,14 @@ export class HistoryPanel extends Panel {
         document.body.appendChild(panel);
 
         // Подписываемся на обновления дерева
-        const originalExecuteCommand = this.tree.executeCommand;
-        this.tree.executeCommand = command => {
-            originalExecuteCommand.call(this.tree, command);
+        const originalExecuteCommand = AppContext.getApp().tree.executeCommand;
+        AppContext.getApp().tree.executeCommand = command => {
+            originalExecuteCommand.call(AppContext.getApp().tree, command);
             this.update();
         };
+
+        // Регистрируем callback для обновления истории
+        AppContext.getApp().tree.setHistoryUpdateCallback(() => this.update());
 
         // Первичное обновление
         this.update();
@@ -92,19 +86,20 @@ export class HistoryPanel extends Panel {
      * @description Обновляет отображение истории.
      */
     update() {
+        const app = AppContext.getApp();
         // Очищаем списки
         this.historyList.innerHTML = '';
         this.redoList.innerHTML = '';
 
         // Обновляем список истории
-        this.tree.history.forEach(command => {
+        app.tree.history.forEach(command => {
             const item = document.createElement('li');
             item.textContent = this._getCommandDescription(command);
             this.historyList.appendChild(item);
         });
 
         // Обновляем список redo
-        this.tree.redoStack.forEach(command => {
+        app.tree.redoStack.forEach(command => {
             const item = document.createElement('li');
             item.textContent = this._getCommandDescription(command);
             this.redoList.appendChild(item);

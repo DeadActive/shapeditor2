@@ -8,15 +8,6 @@ export class PanelStack {
         this.stack = document.createElement('div');
         this.stack.className = 'panel-stack';
         document.body.appendChild(this.stack);
-
-        // Добавляем слушатель для обновления высоты контента при сворачивании
-        this.stack.addEventListener('panelToggle', () => {
-            this.panels.forEach(panel => {
-                if (!panel.isCollapsed) {
-                    panel.content.style.height = panel.content.scrollHeight + 'px';
-                }
-            });
-        });
     }
 
     /**

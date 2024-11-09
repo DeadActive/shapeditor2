@@ -1,6 +1,8 @@
+import { AppContext } from './AppContext.js';
+
 /**
  * @class Renderer
- * @description Класс для рендеринга дерева узлов в DOM с использованием requestAnimationFrame.
+ * @description Класс для рендеринга дерева узлов в DOM.
  */
 export class Renderer {
     /**
@@ -11,7 +13,7 @@ export class Renderer {
         this.tree = tree;
         this.container = container;
         this.svgElement = null;
-        this.pathElements = new Map(); // Кэш элементов для быстрого доступа
+        this.pathElements = new Map();
         this.animationFrameId = null;
         this.isRenderScheduled = false;
     }

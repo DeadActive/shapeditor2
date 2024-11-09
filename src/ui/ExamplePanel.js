@@ -1,4 +1,5 @@
 import { Panel } from './Panel.js';
+import { AppContext } from '../core/AppContext.js';
 
 /**
  * @class ExamplePanel
@@ -6,9 +7,8 @@ import { Panel } from './Panel.js';
  * @description UI панель для переключения между примерами.
  */
 export class ExamplePanel extends Panel {
-    constructor(exampleManager) {
+    constructor() {
         super('Examples', 'example-panel');
-        this.exampleManager = exampleManager;
         this.selectElement = null;
         this.descriptionElement = null;
     }
@@ -26,7 +26,7 @@ export class ExamplePanel extends Panel {
         this.selectElement.className = 'example-select';
 
         // Получаем список примеров и создаем опции
-        const examples = this.exampleManager.getExampleList();
+        const examples = AppContext.getApp().exampleManager.getExampleList();
         examples.forEach(example => {
             const option = document.createElement('option');
             option.value = example.id;
@@ -36,7 +36,7 @@ export class ExamplePanel extends Panel {
 
         // Добавляем обработчик изменения
         this.selectElement.addEventListener('change', () => {
-            this.exampleManager.loadExample(this.selectElement.value);
+            AppContext.getApp().exampleManager.loadExample(this.selectElement.value);
             this.updateDescription();
         });
 
@@ -48,11 +48,18 @@ export class ExamplePanel extends Panel {
         container.appendChild(this.selectElement);
         container.appendChild(this.descriptionElement);
 
-        // Добавляем контейнер в content вместо panel
+        // Добавляем контейнер в content
         this.content.appendChild(container);
 
         // Добавляем панель на страницу
         document.body.appendChild(panel);
+
+        // Устанавливаем начальное значение селекта и описание
+        const currentExample = AppContext.getApp().exampleManager.getCurrentExample();
+        if (currentExample) {
+            this.selectElement.value = currentExample.id;
+            this.updateDescription();
+        }
 
         // Восстанавливаем состояние сворачивания
         this.restoreState();
@@ -60,15 +67,12 @@ export class ExamplePanel extends Panel {
 
     /**
      * @method updateDescription
-     * @private
      * @description Обновляет описание текущего примера.
      */
     updateDescription() {
-        const currentExample = this.exampleManager.getCurrentExample();
+        const currentExample = AppContext.getApp().exampleManager.getCurrentExample();
         if (currentExample) {
             this.descriptionElement.textContent = currentExample.description;
-            // Устанавливаем значение селекта
-            this.selectElement.value = currentExample.id;
         }
     }
 }

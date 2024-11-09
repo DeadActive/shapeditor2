@@ -1,29 +1,20 @@
 import { ZIndexExample } from './ZIndexExample.js';
 import { PerformanceExample } from './PerformanceExample.js';
+import { CloneExample } from './CloneExample.js';
+import { AppContext } from '../core/AppContext.js';
 
 /**
  * @class ExampleManager
- * @description Управляет доступными примерами и их загрузкой.
+ * @description Управляет примерами и их загрузкой.
  */
 export class ExampleManager {
-    constructor(app) {
-        this.app = app;
-        this.examples = new Map();
+    constructor() {
+        this.examples = new Map([
+            ['zindex', new ZIndexExample()],
+            ['performance', new PerformanceExample()],
+            ['clone', new CloneExample()],
+        ]);
         this.currentExample = null;
-        this.initExamples();
-    }
-
-    /**
-     * @method initExamples
-     * @private
-     * @description Инициализирует доступные примеры.
-     */
-    initExamples() {
-        const examples = [new ZIndexExample(), new PerformanceExample()];
-
-        examples.forEach(example => {
-            this.examples.set(example.id, example);
-        });
     }
 
     /**
@@ -37,15 +28,17 @@ export class ExampleManager {
             throw new Error(`Example with id "${id}" not found`);
         }
 
+        const app = AppContext.getApp();
+
         // Очищаем текущий пример
-        this.app.tree.root.children = [];
-        this.app.tree.history = [];
-        this.app.tree.redoStack = [];
+        app.tree.root.children = [];
+        app.tree.history = [];
+        app.tree.redoStack = [];
 
         // Создаем новый пример
         this.currentExample = example;
-        const result = example.create(this.app.tree);
-        this.app.uiManager.renderer.update();
+        const result = example.create(app.tree);
+        app.uiManager.renderer.update();
 
         return result;
     }
